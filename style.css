@@ -95,3 +95,20 @@ footer {
   background: #151922;
   margin-top: 40px;
 }
+
+.image {
+  /* Set exact dimensions */
+  width: 1000px;
+  height: 1000px;
+  
+  /* Prevent stretching (crops instead) */
+  object-fit: cover;
+  
+  /* Center the image */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  
+  /* Optional: space between stacked images */
+  margin-bottom: 30px;
+}
