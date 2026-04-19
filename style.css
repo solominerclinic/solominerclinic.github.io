@@ -112,3 +112,15 @@ footer {
   /* Optional: space between stacked images */
   margin-bottom: 30px;
 }
+
+.img-container {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  width: 100%;
+}
+
+.blog-image {
+  width: 1000px;
+  height: 1000px;
+  object-fit: cover;
+}
