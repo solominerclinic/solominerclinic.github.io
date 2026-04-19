@@ -75,7 +75,7 @@ header {
 
 .buy {
   display: inline-block;
-  padding: 20px 100px;
+  padding: 20px 20px;
   background: #00ffcc;
   color: #000;
   text-decoration: none;
