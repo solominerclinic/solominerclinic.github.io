@@ -38,20 +38,20 @@ header {
 }
 
 .spec {
-  color: #aaa;
+  color: #FFFFFF;
 }
 
 .price {
   font-size: 20px;
   margin: 10px 0;
-  color: #00ffcc;
+  color: #FFFFFF;
 }
 
 .btn {
   display: inline-block;
   padding: 10px 15px;
-  background: #FA720F;
-  color: #000;
+  background: #C45809;
+  color: #FFFFFF;
   text-decoration: none;
   border-radius: 8px;
 }
@@ -89,13 +89,12 @@ header {
   color: #aaa;
 }
 
-footer {
+.footer {
   text-align: center;
   padding: 20px;
   background: #151922;
   margin-top: 40px;
 }
-
 .zoom-img {
  width: 1000px;
 width: auto; /* Set your desired thumbnail size */
