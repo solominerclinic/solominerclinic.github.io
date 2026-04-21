@@ -95,3 +95,14 @@ footer {
   background: #151922;
   margin-top: 40px;
 }
+
+.zoom-img {
+ width: 1000px;
+width: auto; /* Set your desired thumbnail size */
+  transition: transform 0.3s ease; /* Smooth transition */
+  cursor: zoom-in;
+}
+
+.zoom-img:hover {
+  transform: scale(1.2); /* Enlarges the image by 10% on hover */
+}
