@@ -332,21 +332,6 @@ I prefer efficiency, reliability, and longevity.<br>
 </div>
 
 <script>
-    const namespace = "yourdomain.com";
-    const key = "homepage";
-
-    fetch(`https://countapi.xyz/hit/${namespace}/${key}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('visits-count').innerText = data.value;
-        })
-        .catch(error => {
-            console.error('Error fetching counter:', error);
-            document.getElementById('visits-count').innerText = "N/A";
-        });
-</script>
-
-<script>
 document.addEventListener("DOMContentLoaded", () => {
   const gallery  = document.querySelector('.gallery');
   const lightbox = document.getElementById('lightbox');
