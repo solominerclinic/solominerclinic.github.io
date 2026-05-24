@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor's Notes — NerdEko assembly | SoloMinerClinic</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #F7931A;
+  --dark: #0D0D0D;
+  --card: #161616;
+  --border: rgba(255,255,255,0.08);
+  --text: #F5F5F5;
+  --muted: #9a9a9a;
+  --white: #FFFFFF;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); }
+
+/* HEADER */
+header {
+  position: sticky; top: 0;
+  background: rgba(13,13,13,0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.header-title { text-align: center; padding: 1rem; }
+.header-title a {
+  font-family: 'Space Mono', monospace;
+  color: var(--orange); text-decoration: none; font-size: 1.4rem;
+}
+.indent {
+text-indent: 30px;
+}
+/* LAYOUT */
+.blog-wrap { max-width: 760px; margin: 0 auto; padding: 2rem 1.2rem 4rem; }
+
+.blog-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem; color: var(--muted);
+  margin-bottom: 1rem; letter-spacing: 0.1em;
+}
+.blog-title {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 600; margin-bottom: 1rem;
+}
+.blog-sub { font-size: 1rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.7; }
+
+/* LIGHTBOX */
+.lightbox {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.95);
+  display: none; justify-content: center; align-items: center;
+  z-index: 999; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox-img {
+  max-width: 95vw; max-height: 90vh;
+  border-radius: 10px; object-fit: contain; cursor: default;
+}
+.lightbox-close {
+  position: fixed; top: 16px; right: 22px;
+  color: white; font-size: 2rem; cursor: pointer;
+  line-height: 1; opacity: 0.7; transition: opacity 0.2s;
+  background: none; border: none;
+}
+.lightbox-close:hover { opacity: 1; }
+
+/* GALLERY */
+.gallery-wrap { position: relative; margin: 2rem 0; }
+.arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,0.6); border: 1px solid var(--border);
+  color: white; font-size: 22px; padding: 8px 14px;
+  cursor: pointer; z-index: 2; border-radius: 6px; line-height: 1;
+  transition: background 0.2s;
+}
+.arrow.left { left: 8px; }
+.arrow.right { right: 8px; }
+.arrow:hover { background: rgba(255,255,255,0.15); }
+.gallery {
+  display: flex; gap: 10px;
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  padding-bottom: 8px; cursor: grab;
+  -webkit-overflow-scrolling: touch;
+}
+.gallery:active { cursor: grabbing; }
+.gallery::-webkit-scrollbar { display: none; }
+.gallery img {
+  flex: 0 0 85%; max-width: 85%;
+  border-radius: 10px; border: 1px solid var(--border);
+  scroll-snap-align: center; cursor: zoom-in;
+  object-fit: cover; aspect-ratio: 4/3;
+  user-select: none; -webkit-user-drag: none;
+}
+
+/* CONTENT */
+.blog-content { font-size: 1rem; line-height: 1.9; }
+.blog-content p { margin-bottom: 1.4rem; color: #ddd; }
+.blog-content h2 { margin-top: 2.5rem; margin-bottom: 0.8rem; font-size: 1.25rem; }
+.blog-back {
+  display: inline-block; margin-top: 3rem;
+  font-size: 0.9rem; color: var(--orange); text-decoration: none;
+}
+
+/* ── Bottom nav buttons ── */
+.post-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.15s;
+  cursor: pointer;
+  border: none;
+}
+.btn-back:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-back-notes {
+  background: var(--orange);
+  color: #0D0D0D;
+}
+.btn-back-inventory {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.15) !important;
+}
+.btn-back-inventory:hover {
+  border-color: rgba(255,255,255,0.35) !important;
+}
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem; text-align: center;
+  color: var(--muted); font-size: 0.8rem;
+}
+
+.btn-telegram {
+  background: #229ED9; /* Telegram blue */
+  color: white;
+}
+.btn-telegram:hover {
+  background: #1b8cc4;
+}
+@media (max-width: 600px) {
+  .gallery img { flex: 0 0 90%; max-width: 90%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">
+    <a href="index.html">SoloMinerClinic</a>
+  </div>
+</header>
+
+<div class="blog-wrap">
+
+  <div class="blog-meta">REPAIR CASE · May 21 2026</div>
+
+  <h1 class="blog-title">My Journey with NerdEko</h1>
+
+  <div class="blog-sub">Building NerdEko Miner from A to Z</div>
+
+  <div class="gallery-wrap">
+    <button class="arrow left" onclick="scrollGallery(-1)">&#8249;</button>
+    <div class="gallery">
+    <img src="https://i.imgur.com/IdyTHyo.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/6EZ053t.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/hLXApvS.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/Pi1Yi9d.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/AaZYe1p.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/Jpa0RkT.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/RVL10X1.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/PiwpJku.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/gujxNjS.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/sbiT36U.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/S0TmTaN.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/8dvyzE1.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/NrXKMWA.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/rVas97R.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/XcwA3Ua.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/5SKBFKM.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/DsxCjLr.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/mqYwFEI.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/LHkflFB.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/HGSXwJM.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/KSQRYND.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/8Tkamem.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/cjFKodR.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/7Z5gnkN.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/v97crTM.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/KZhln8f.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/W3zj66g.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/GLYrtAK.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/KF6fU0y.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/cINlNiw.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/J6lQ8Xs.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/p4Y5VCo.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/a4Kga0I.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/5oToRAx.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/XKsHBQ4.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/2kmxI89.png" loading="lazy">
+    <img src="https://i.imgur.com/abAgqnB.png" loading="lazy">
+    <img src="https://i.imgur.com/sCr6W9H.png" loading="lazy">
+    <img src="https://i.imgur.com/iPWLpaO.png" loading="lazy">
+    <img src="https://i.imgur.com/IBvkGnh.png" loading="lazy">
+    <img src="https://i.imgur.com/rrSgmeG.png" loading="lazy">
+        </div>
+    <button class="arrow right" onclick="scrollGallery(1)">&#8250;</button>
+  </div>
+
+  <div class="blog-content">
+
+    <p class="indent">It is finally time to write about my journey with NerdEko.</p>
+<p class="indent">Everything started about three months ago when I received a message on Reddit asking how much I would charge to solder 12 ASICs onto a NerdEko PCB. I had heard about NerdEko before, but honestly, I never paid much attention to it.</p>
+<p class="indent">The person who contacted me had no soldering experience, but at first he was confident he could assemble everything himself. After some time, reality kicked in and he realized this was not the kind of project you learn on overnight.</p>
+<p class="indent">Meanwhile, I started digging through GitHub and Discord looking for information about this mysterious miner called NerdEko.</p>
+<p class="indent"><strong>And I found almost nothing.</strong></p>
+<p class="indent">That became the trigger for me. I wanted to build one myself and document the process — the lessons, mistakes, modifications, and advice that nobody else seemed willing to share.</p>
+<p class="indent">It took almost two months for the PCBs to be soldered and shipped to me. But when you have a goal, waiting becomes part of the process.</p>
+<p class="indent">When all the parts finally arrived, I carefully inspected every component and immediately ordered extra materials for modifications I already knew would be necessary. I did not want to rush the build just to burn the miner down later.</p>
+<p class="indent">Slowly but surely, the project moved toward the finish line.</p>
+<p class="indent">What surprised me most was how secretive everything around <strong>NerdEko</strong> seemed to be. From Discord, I discovered that many people had already assembled these miners for personal use, yet almost nobody published detailed instructions, cooling advice, or assembly ideas.</p>
+<p class="indent">So here we are.</p>
+<p class="indent">Let’s begin.</p>
+<h2>VRMs — The Weakest Point</h2>
+<p class="indent">The first thing I discovered from Discord and GitHub discussions was that the VRMs are the weakest spot on the PCB. It is very similar to the issues found on NerdOctaxe boards.</p>
+<p class="indent">Since I already had experience modifying cooling systems, I decided not to rely entirely on the hydro tank cooling the VRMs from the top side only.</p>
+<p class="indent">My first solution was simple: I glued heatsinks onto the back side of the VRM area. Initially I installed only one row of heatsinks, but later I thought:<br>
+“What if I add two more rows and create something to mount a fan on it?”<br></p>
+<p class="indent">Five minutes later, it was done.</p>
+<p class="indent">Eventually, after testing the miner under load, I realized there is an even better solution.</p>
+<p class="indent">If I were building another NerdEko today, I would simply buy a large 80x40x20mm heatsink, drill holes for the screws and capacitors to avoide shorts, and mount a fan directly on top. Airflow would forcefully move across the entire VRM section, pulling heat away much more effectively.</p>
+<p class="indent">I even added pictures showing exactly where the holes should be drilled.</p>
+<h2>Hydro Tank Problems</h2>
+<p class="indent">The next step was installing the VRM heatsink and hydro tank.</p>
+<p class="indent">This part was tricky — not difficult, but you needed to understand what you were looking at.</p>
+<p class="indent">During a dry fit test, I immediately spotted a major design issue with the hydro tank.</p>
+<p class="indent">The tank uses three mounting posts for screws, but the posts were simply too long. Because of this, the gap between the VRMs and the cooling tank was too large, meaning heat would become trapped in both the VRMs and the thermal pad layer.</p>
+<p class="indent">That is a direct path to VRM overheating and eventual failure.</p>
+<p class="indent">So out came my favorite tool: the file.</p>
+<p class="indent">I removed approximately 1–1.5mm from each mounting post.</p>
+<p class="indent">The difference was huge.</p>
+<p class="indent">Before filing, the thermal paste showed only spot contact. After filing, the thermal paste spread evenly across the entire surface, proving that the VRMs and inductors were finally making proper contact with the tank.</p>
+<p class="indent">I also took photos showing the gap between the PCB and mounting posts after installation.</p>
+<p class="indent">Now I am fully confident the cooling system is actually doing its job.</p>
+<h2>ASIC Tank Installation — Dangerous, Not Difficult</h2>
+<p class="indent">Installing the ASIC cooling tank turned out to be completely different compared to NerdQaxe or Bitaxe builds.</p>
+<p class="indent">The process itself was not hard.</p>
+<p class="indent">The dangerous part was handling the heavy tank above exposed ASICs.</p>
+<p class="indent">Unfortunately, I already learned this lesson the hard way when I accidentally dropped a screwdriver onto one NerdEko board and cracked an ASIC.</p>
+<p class="indent">With these tanks, everything must be done in one smooth motion:</p>
+<ul>
+    <li>Place the tank</li>
+    <li>Align it perfectly</li>
+    <li>Install the screws</li>
+    <li>Do not move while putting screws</li></ul>
+<p class="indent">Any movement can disturb the thermal paste layer or damage components.</p>
+<p class="indent"><strong>Honestly, it was a little stressful.</strong></p>
+<p class="indent">But it worked.</p>
+
+<h2>First Power-Up</h2>
+<p class="indent">After connecting the tanks, hoses, clamps, and pump, I spent about 30 minutes bleeding air bubbles out of the system as recommended.</p>
+<p class="indent">While the cooling loop was running cold, I prepared the power wiring using 10AWG cable and proper crimps to keep everything clean and professional.</p>
+<p class="indent">Then came the moment of truth.</p>
+<p class="indent">Power-up time.</p>
+<p class="indent">One mistake and the entire day could end with smoke and zero results.</p>
+<p class="indent">I plugged it in.</p>
+<p class="indent">Silence.</p>
+<p class="indent">For a second, I thought something was wrong.</p>
+<p class="indent">Then suddenly:</p>
+<p class="indent"><strong>WOOOOOOOOOOOOOOOOOOOO!</strong></p>
+<p class="indent">The rear fan screamed like a turbine and the screen lit up.</p>
+<p class="indent">That moment of satisfaction is hard to describe.</p>
+<p class="indent">At first the screen showed 0 hash rate. I did not even open the web interface yet. I just stared at the display waiting.</p>
+<ul>
+<li>2 TH/s…</li>
+<li>3 TH/s…</li>
+<li>7 TH/s…</li>
+<li>10 TH/s…</li>
+<li>11 TH/s…</li></ul>
+<p class="indent">It was alive.</p>
+<p class="indent">At that moment I already knew all ASICs were detected and hashing correctly.</p>
+<p class="indent">That was the victory.</p>
+<h2>Tuning and Testing</h2>
+<p class="indent">For the initial startup, I intentionally set frequency and voltage to the absolute minimum values. I did not want the miner running full power during its first seconds of life.</p>
+<p class="indent">After some stable runtime, I slowly began increasing frequency and voltage.<br>
+Temperatures climbed.<br>
+Power consumption climbed.<br>
+Hashrate climbed.<br>
+And surprisingly, efficiency remained very good.<br>
+After a short round of testing, the miner reached 13.6 TH/s.<br>
+Still, I eventually reduced it back to lower settings where temperatures and efficiency were balanced well.<br>
+I am not chasing maximum TH/s.<br>
+I prefer efficiency, reliability, and longevity.<br>
+<h2>Final Thoughts</h2>
+<p class="indent">I added many pictures to this article showing the build process, cooling modifications, and hashrates at different settings.</p>
+<p class="indent">Hopefully this helps future builders because information about NerdEko is still extremely limited.</p>
+<p class="indent">If you have questions, I am always happy to help.</p>
+<p class="indent">And if you want a fully built NerdEko, I can build one for you.</p>
+
+</div>
+
+  <div class="post-actions">
+  <a href="../index.html#blog" class="btn-back btn-back-notes">&#8592; Doctor's Notes</a>
+  <a href="../index.html#inventory" class="btn-back btn-back-inventory">&#9883; Inventory for Sale</a>
+  <a href="https://t.me/SoloMinerClinic" target="_blank" class="btn-back btn-telegram">✈ Telegram</a>
+</div>
+
+</div>
+
+<footer>© 2026 Solo Miner Clinic. All rights reserved.</footer>
+
+<div id="lightbox" class="lightbox">
+  <button class="lightbox-close">&times;</button>
+  <img class="lightbox-img" src="" alt="">
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const gallery  = document.querySelector('.gallery');
+  const lightbox = document.getElementById('lightbox');
+  const lbImg    = lightbox.querySelector('.lightbox-img');
+  const closeBtn = lightbox.querySelector('.lightbox-close');
+  let isDown = false, startX, scrollLeft, wasDragging = false;
+
+  // Lightbox open/close
+  function openLightbox(src) {
+    lbImg.src = src;
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  gallery.querySelectorAll('img').forEach(img => {
+    img.addEventListener('click', () => { if (!wasDragging) openLightbox(img.src); });
+  });
+  closeBtn.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if (e.target !== lbImg) closeLightbox(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  // Arrow scroll
+  window.scrollGallery = dir =>
+    gallery.scrollBy({ left: dir * gallery.clientWidth * 0.85, behavior: 'smooth' });
+
+  // Mouse drag
+  gallery.addEventListener('mousedown', e => {
+    isDown = true; wasDragging = false;
+    startX = e.pageX - gallery.offsetLeft;
+    scrollLeft = gallery.scrollLeft;
+  });
+  gallery.addEventListener('mouseleave', () => { isDown = false; });
+  gallery.addEventListener('mouseup',    () => { isDown = false; });
+  gallery.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    e.preventDefault();
+    const dx = (e.pageX - gallery.offsetLeft - startX) * 1.5;
+    if (Math.abs(dx) > 4) wasDragging = true;
+    gallery.scrollLeft = scrollLeft - dx;
+  });
+
+  // Touch
+  let touchStartX = 0;
+  gallery.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  gallery.addEventListener('touchend', e => {
+    wasDragging = Math.abs(e.changedTouches[0].clientX - touchStartX) > 10;
+    setTimeout(() => { wasDragging = false; }, 100);
+  });
+});
+</script>
+
+</body>
+</html>
