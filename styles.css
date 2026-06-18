@@ -364,6 +364,9 @@ section { padding: 5rem 2rem; }
 .center { text-align: center; margin-top: 3rem; }
 
 /* ── Inventory ── */
+.hidden {
+display: none;
+}
 .inventory-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
