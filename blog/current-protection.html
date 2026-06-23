@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor's Notes — Current Protection Error | SoloMinerClinic</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #F7931A;
+  --dark: #0D0D0D;
+  --card: #161616;
+  --border: rgba(255,255,255,0.08);
+  --text: #F5F5F5;
+  --muted: #9a9a9a;
+  --white: #FFFFFF;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); }
+
+/* HEADER */
+header {
+  position: sticky; top: 0;
+  background: rgba(13,13,13,0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.header-title { text-align: center; padding: 1rem; }
+.header-title a {
+  font-family: 'Space Mono', monospace;
+  color: var(--orange); text-decoration: none; font-size: 1.4rem;
+}
+
+/* LAYOUT */
+.blog-wrap { max-width: 760px; margin: 0 auto; padding: 2rem 1.2rem 4rem; }
+
+.blog-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem; color: var(--muted);
+  margin-bottom: 1rem; letter-spacing: 0.1em;
+}
+.blog-title {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 600; margin-bottom: 1rem;
+}
+.blog-sub { font-size: 1rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.7; }
+
+/* LIGHTBOX */
+.lightbox {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.95);
+  display: none; justify-content: center; align-items: center;
+  z-index: 999; cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox-img {
+  max-width: 95vw; max-height: 90vh;
+  border-radius: 10px; object-fit: contain; cursor: default;
+}
+.lightbox-close {
+  position: fixed; top: 16px; right: 22px;
+  color: white; font-size: 2rem; cursor: pointer;
+  line-height: 1; opacity: 0.7; transition: opacity 0.2s;
+  background: none; border: none;
+}
+.lightbox-close:hover { opacity: 1; }
+
+/* GALLERY */
+.gallery-wrap { position: relative; margin: 2rem 0; }
+.arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,0.6); border: 1px solid var(--border);
+  color: white; font-size: 22px; padding: 8px 14px;
+  cursor: pointer; z-index: 2; border-radius: 6px; line-height: 1;
+  transition: background 0.2s;
+}
+.arrow.left { left: 8px; }
+.arrow.right { right: 8px; }
+.arrow:hover { background: rgba(255,255,255,0.15); }
+.gallery {
+  display: flex; gap: 10px;
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  padding-bottom: 8px; cursor: grab;
+  -webkit-overflow-scrolling: touch;
+}
+.gallery:active { cursor: grabbing; }
+.gallery::-webkit-scrollbar { display: none; }
+.gallery img {
+  flex: 0 0 85%; max-width: 85%;
+  border-radius: 10px; border: 1px solid var(--border);
+  scroll-snap-align: center; cursor: zoom-in;
+  object-fit: cover; aspect-ratio: 4/3;
+  user-select: none; -webkit-user-drag: none;
+}
+
+/* CONTENT */
+.blog-content { font-size: 1rem; line-height: 1.9; }
+.blog-content p { margin-bottom: 1.4rem; color: #ddd; text-indent: 30px; }
+.blog-content h2 { margin-top: 2.5rem; margin-bottom: 0.8rem; font-size: 1.25rem; }
+.blog-content ul {
+  margin: 0 0 1.4rem 2rem;
+  color: #ddd;
+}
+.blog-content ul li { margin-bottom: 0.4rem; line-height: 1.7; }
+.blog-content strong { color: #fff; }
+
+/* BOTTOM BUTTONS */
+.post-actions {
+  display: flex; gap: 0.75rem; margin-top: 3rem; flex-wrap: wrap;
+}
+.btn-back {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.75rem 1.4rem; border-radius: 6px;
+  font-size: 0.88rem; font-weight: 600; font-family: 'Inter', sans-serif;
+  text-decoration: none; transition: opacity 0.2s, transform 0.15s;
+  cursor: pointer; border: none;
+}
+.btn-back:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-back-notes { background: var(--orange); color: #0D0D0D; }
+.btn-back-inventory {
+  background: transparent; color: var(--text);
+  border: 1px solid rgba(255,255,255,0.15) !important;
+}
+.btn-back-inventory:hover { border-color: rgba(255,255,255,0.35) !important; }
+.btn-telegram { background: #229ED9; color: white; }
+.btn-telegram:hover { background: #1b8cc4; }
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem; text-align: center;
+  color: var(--muted); font-size: 0.8rem;
+}
+
+.counter-container { text-align: center; padding: 1rem 0 0; }
+
+@media (max-width: 600px) {
+  .gallery img { flex: 0 0 90%; max-width: 90%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">
+    <a href="../index.html">SoloMinerClinic</a>
+  </div>
+</header>
+
+<div class="blog-wrap">
+
+  <div class="blog-meta">REPAIR CASE · MAY 24 2026</div>
+
+  <h1 class="blog-title">Current Protection Error — What Is It Really?</h1>
+
+  <div class="blog-sub">Why a "Current Protection Error" is often a cooling problem in disguise — and how proper ASIC pressure fixes it for good.</div>
+
+  <div class="gallery-wrap">
+    <button class="arrow left" onclick="scrollGallery(-1)">&#8249;</button>
+    <div class="gallery">
+      <img src="https://i.imgur.com/VnjxiNG.jpeg" loading="lazy">
+      <img src="https://i.imgur.com/IMp4sLR.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/lpOaLCC.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/H4G2ODR.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/A6ABIcj.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/0nfUfZ8.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/eT3giYe.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/YUXsmiM.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/1Qk1y0E.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/pLvzn8m.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/cHJv873.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/lW6iqgn.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/EbNnBbN.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/ZkDwcrr.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/9xaxfxI.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/QDMS2Hx.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/Y9TJWsv.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/x2pcNpd.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/f4ZZJ5o.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/kdeW0U2.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/kgZwanN.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/a1lTFQv.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/CwOMMWX.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/xo8SkSp.jpeg" loading="lazy">
+    <img src="https://i.imgur.com/NeOX47i.jpeg" loading="lazy">
+ 
+
+
+    </div>
+    <button class="arrow right" onclick="scrollGallery(1)">&#8250;</button>
+  </div>
+
+  <div class="blog-content">
+
+    <p>Today, I received a miner with a <strong>Current Protection Error</strong>, and I thought it would be a good opportunity to address one of the most common questions I receive on Reddit and in private messages.</p>
+
+    <p>The answer is surprisingly simple.</p>
+
+    <p><strong>In many cases, it all comes down to proper pressure on the ASICs.</strong></p>
+
+    <p>That's it.</p>
+
+    <p>Your miner may be perfectly healthy and fully capable of hashing. The problem is often not a damaged ASIC or a defective PCB. Sometimes, the heatsink simply isn't installed correctly.</p>
+
+    <p>Let me show you what I found on the Hydro miner currently sitting on my workbench.</p>
+
+    <h2>The Root Cause</h2>
+
+    <p>Take a look at the pictures.</p>
+
+    <p>You'll notice that the springs are not compressed, while the retaining rings are tight and carrying the load. This means there is little to no pressure being applied to the ASIC surfaces.</p>
+
+    <p>When the miner starts hashing, the ASICs heat up very quickly due to poor thermal contact. Before the temperature sensor has enough time to react, the ASICs begin drawing excessive current.</p>
+
+    <p>The miner detects this abnormal current draw and triggers a <strong>Current Protection Error</strong>.</p>
+
+    <p>So, in many situations, the protection circuit is actually doing its job and protecting your hardware.</p>
+
+    <h2>Confirming the Diagnosis</h2>
+
+    <p>To make sure I wasn't missing something, I removed the Hydro assembly and tested the miner using a standard heatsink.</p>
+
+    <p>As you can see from the results, the miner hashed perfectly well.</p>
+
+    <p>The hashrate was lower than expected, but that was intentional because I used conservative frequency and voltage settings during testing.</p>
+
+    <p>The important part is that the Current Protection Error disappeared completely.</p>
+
+    <p>That confirmed my suspicion.</p>
+
+    <p>The miner itself was healthy.</p>
+
+    <h2>Building It Properly</h2>
+
+    <p>Now it was time to assemble the miner the right way so it could run efficiently and reliably for the long term.</p>
+
+    <p>I started by installing <strong>steel LGA1200 reinforcement brackets</strong>.</p>
+
+    <p>I cleaned the cold plate thoroughly before reassembly. Interestingly, you can clearly see the footprints from all four ASICs on the contact surface. You can also see signs of rubbing caused by insufficient mounting pressure.</p>
+
+    <p>After installation, the difference was obvious.</p>
+
+    <p>The springs were now compressed and actively applying pressure to the ASICs, while the retaining rings remained completely free.</p>
+
+    <p>This is one of the easiest ways to verify that your Hydro setup is assembled correctly.</p>
+
+    <p>Personally, I would prefer to have slightly more mounting pressure. However, the thicker shoulder section of the factory screws does not pass through the PCB mounting holes, limiting the amount of compression available.</p>
+
+    <h2>Improving VRM Cooling</h2>
+
+    <p>Since I already had the miner apart, I decided to improve the VRM cooling as well.</p>
+
+    <p>I installed a <strong>Bitaxe Gamma heatsink with an attached fan</strong> on the back side of the VRM section.</p>
+
+    <p>The results were impressive.</p>
+
+    <p>The additional airflow eliminated the need for another fan mounted at the front of the miner, while significantly improving VRM temperatures.</p>
+
+    <p>At this point, the miner operates at approximately:</p>
+
+    <ul>
+      <li><strong>50°C</strong> ASIC temperature</li>
+      <li><strong>42°C</strong> VRM temperature</li>
+    </ul>
+
+    <p>Because of these temperatures, I don't believe it's even necessary to glue individual heatsinks onto each VRM module.</p>
+
+    <p>At least in this particular setup, the current solution appears more than sufficient.</p>
+
+    <h2>Final Thoughts</h2>
+
+    <p>If your Hydro miner is showing a <strong>Current Protection Error</strong>, don't immediately assume the worst.</p>
+
+    <p>Before replacing expensive components, take a close look at the cooling assembly:</p>
+
+    <ul>
+      <li>Are the springs actually compressed?</li>
+      <li>Are the retaining rings free from pressure?</li>
+      <li>Is the cold plate making proper contact with all ASICs?</li>
+      <li>Do you see even ASIC footprints on the contact surface?</li>
+      <li>Are the mounting screws bottoming out before the springs can do their job?</li>
+    </ul>
+
+    <p>Sometimes the solution isn't replacing hardware.</p>
+
+    <p>Sometimes it's simply installing the heatsink correctly.</p>
+
+    <p>What do you think?</p>
+
+    <p>Have you experienced Current Protection Errors on your miners? Have you found other modifications that improved reliability or cooling?</p>
+
+    <p>I am always open to conversations, ideas, and learning from the community.</p>
+
+  </div>
+
+  <div class="post-actions">
+    <a href="../index.html#blog" class="btn-back btn-back-notes">&#8592; Doctor's Notes</a>
+    <a href="../index.html#inventory" class="btn-back btn-back-inventory">&#9883; Inventory for Sale</a>
+    <a href="https://t.me/SoloMinerClinic" target="_blank" class="btn-back btn-telegram">&#9992; Telegram</a>
+  </div>
+
+</div>
+
+<footer>© 2026 Solo Miner Clinic. All rights reserved.</footer>
+
+<div id="lightbox" class="lightbox">
+  <button class="lightbox-close">&times;</button>
+  <img class="lightbox-img" src="" alt="">
+</div>
+
+<div class="counter-container">
+  <img src="https://hitscounter.dev/api/count/incr/badge.svg?url=https%3A%2F%2Fsolominerclinic.github.io%2Fblog%2Fcurrentprotectionerror.html&count_bg=%23F7931A&title_bg=%23161616&title=views&edge_flat=true"
+       style="height:20px; border-radius:4px; vertical-align:middle;" alt="visit counter">
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const gallery  = document.querySelector('.gallery');
+  const lightbox = document.getElementById('lightbox');
+  const lbImg    = lightbox.querySelector('.lightbox-img');
+  const closeBtn = lightbox.querySelector('.lightbox-close');
+  let isDown = false, startX, scrollLeft, wasDragging = false;
+
+  function openLightbox(src) {
+    lbImg.src = src;
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  gallery.querySelectorAll('img').forEach(img => {
+    img.addEventListener('click', () => { if (!wasDragging) openLightbox(img.src); });
+  });
+  closeBtn.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if (e.target !== lbImg) closeLightbox(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  window.scrollGallery = dir =>
+    gallery.scrollBy({ left: dir * gallery.clientWidth * 0.85, behavior: 'smooth' });
+
+  gallery.addEventListener('mousedown', e => {
+    isDown = true; wasDragging = false;
+    startX = e.pageX - gallery.offsetLeft;
+    scrollLeft = gallery.scrollLeft;
+  });
+  gallery.addEventListener('mouseleave', () => { isDown = false; });
+  gallery.addEventListener('mouseup',    () => { isDown = false; });
+  gallery.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    e.preventDefault();
+    const dx = (e.pageX - gallery.offsetLeft - startX) * 1.5;
+    if (Math.abs(dx) > 4) wasDragging = true;
+    gallery.scrollLeft = scrollLeft - dx;
+  });
+
+  let touchStartX = 0;
+  gallery.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  gallery.addEventListener('touchend', e => {
+    wasDragging = Math.abs(e.changedTouches[0].clientX - touchStartX) > 10;
+    setTimeout(() => { wasDragging = false; }, 100);
+  });
+});
+</script>
+
+</body>
+</html>
