@@ -584,3 +584,33 @@ footer {
   font-size: 0.8rem;
   color: var(--orange);
 }
+
+/* ── Promo marquee ── */
+.promo-marquee {
+  overflow: hidden;
+  background: rgba(247,147,26,0.08);
+  border: 1px solid rgba(247,147,26,0.25);
+  border-radius: 6px;
+  padding: 0.6rem 0;
+  margin-bottom: 2rem;
+}
+
+.promo-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 18s linear infinite;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #F7931A;
+  letter-spacing: 0.05em;
+}
+
+.promo-marquee:hover .promo-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
